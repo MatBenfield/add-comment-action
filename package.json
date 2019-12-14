@@ -1,5 +1,5 @@
 {
-  "name": "typescript-action",
+  "name": "add-comment-action",
   "version": "0.0.0",
   "private": true,
   "description": "TypeScript template action",
@@ -26,7 +26,8 @@
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.2.0",
-    "@actions/github": "^2.0.0"
+    "@actions/github": "^2.0.0",
+    "outdent": "^0.7.0"
   },
   "devDependencies": {
     "@types/jest": "^24.0.23",

@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import { WebhookPayload, PayloadRepository } from '@actions/github/lib/interfaces';
+import outdent from 'outdent';
 
 function getRepoData(repo: PayloadRepository | undefined): any {
   if(repo) {
@@ -20,9 +21,27 @@ function getIssueData(issue: any): any {
     throw new Error("Issue data was not found in event payload.");
   }
 }
+function createIssueComment(message: string, status: string, mentions:Array<string>=[]): string {
+  const statusIcon:string = status === 'failed' ? ':X:' : ':white_check_mark:'
+  let mentionsText:string = '';
+
+  for(let mention of mentions) {
+    mentionsText += `@${mention} `;
+  }
+
+  const body:string = outdent`## Outcome
+
+  ${statusIcon} ${message}
+
+  CC: ${mentionsText}
+  `;
+
+  return body;
+}
 async function run(): Promise<void> {
   try {
-    const body: string = core.getInput('message');
+    const message: string = core.getInput('message');
+    const status: string = core.getInput('stepStatus');
     const githubToken: string = process.env.GITHUB_TOKEN || '';
 
     if(githubToken) {
@@ -33,6 +52,7 @@ async function run(): Promise<void> {
       const repository = payload.repository;
       const { owner, name:repo } = getRepoData(repository);
       const { number } = getIssueData(issue);
+      const body = createIssueComment(message, status);
 
       await octokit.issues.createComment({
         body,
