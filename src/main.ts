@@ -1,7 +1,25 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
-import { WebhookPayload } from '@actions/github/lib/interfaces';
+import { WebhookPayload, PayloadRepository } from '@actions/github/lib/interfaces';
 
+function getRepoData(repo: PayloadRepository | undefined): any {
+  if(repo) {
+    const owner: string = repo.owner.login;
+    const name: string = repo.name;
+
+    return { owner, name };
+  } else {
+    throw new Error("Repository data was not found in event payload.");
+  }
+}
+function getIssueData(issue: any): any {
+  if(issue) {
+    const number:number = issue.number;
+    return { number };
+  } else {
+    throw new Error("Issue data was not found in event payload.");
+  }
+}
 async function run(): Promise<void> {
   try {
     const body: string = core.getInput('message');
@@ -13,31 +31,18 @@ async function run(): Promise<void> {
       const payload: WebhookPayload = github.context.payload;
       const issue = payload.issue;
       const repository = payload.repository;
+      const { owner, name:repo } = getRepoData(repository);
+      const { number } = getIssueData(issue);
 
-      let owner: string;
-      let repo: string;
-
-      if(repository) {
-        owner = repository.owner.login,
-        repo = repository.name
-      } else {
-        throw new Error("Repository data was not found in event payload.");
-      }
-      if(issue) {
-        const number:number = issue.number;
-        await octokit.issues.createComment({
-          body,
-          number,
-          owner,
-          repo
-        });
-      } else {
-        throw new Error("Issue data was not found in event payload.")
-      }
+      await octokit.issues.createComment({
+        body,
+        number,
+        owner,
+        repo
+      });
     } else {
-      throw new Error('GitHub token was not found in environment.')
+      throw new Error('GitHub token was not found in environment.');
     }
-
   } catch (error) {
     core.setFailed(error.message);
   }
