@@ -1,10 +1,9 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Composable Issue Comments'
+description: 'This is a composable action that will write a comment to a GitHub Issue or Pull Request.'
+author: 'Froilán Irizarry Rivera'
 inputs:
-  myInput:              # change this
-    description: 'input description here'
-    default: 'default value if applicable'
+  message:
+    description: 'Issue or Pull Request message'
 runs:
   using: 'node12'
   main: 'dist/index.js'
