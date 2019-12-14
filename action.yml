@@ -4,6 +4,11 @@ author: 'Froilán Irizarry Rivera'
 inputs:
   message:
     description: 'Issue or Pull Request message'
+    required: true
+  stepStatus:
+    description: 'The status of the previous step. This will change the comment body.'
+    default: 'failed'
+    required: true
 runs:
   using: 'node12'
   main: 'dist/index.js'
