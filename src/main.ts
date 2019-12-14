@@ -1,19 +1,46 @@
-import * as core from '@actions/core'
-import {wait} from './wait'
+import * as core from '@actions/core';
+import * as github from '@actions/github';
+import { WebhookPayload } from '@actions/github/lib/interfaces';
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`)
+    const body: string = core.getInput('message');
+    const githubToken: string = process.env.GITHUB_TOKEN || '';
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    if(githubToken) {
+      const octokit: github.GitHub = new github.GitHub(githubToken);
 
-    core.setOutput('time', new Date().toTimeString())
+      const payload: WebhookPayload = github.context.payload;
+      const issue = payload.issue;
+      const repository = payload.repository;
+
+      let owner: string;
+      let repo: string;
+
+      if(repository) {
+        owner = repository.owner.login,
+        repo = repository.name
+      } else {
+        throw new Error("Repository data was not found in event payload.");
+      }
+      if(issue) {
+        const number:number = issue.number;
+        await octokit.issues.createComment({
+          body,
+          number,
+          owner,
+          repo
+        });
+      } else {
+        throw new Error("Issue data was not found in event payload.")
+      }
+    } else {
+      throw new Error('GitHub token was not found in environment.')
+    }
+
   } catch (error) {
-    core.setFailed(error.message)
+    core.setFailed(error.message);
   }
 }
 
-run()
+run();
