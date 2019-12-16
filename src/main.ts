@@ -1,43 +1,12 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
-import { WebhookPayload, PayloadRepository } from '@actions/github/lib/interfaces';
-import outdent from 'outdent';
+import { WebhookPayload } from '@actions/github/lib/interfaces';
+import {
+  getRepoData,
+  getIssueData,
+  createIssueComment
+} from './utils';
 
-function getRepoData(repo: PayloadRepository | undefined): any {
-  if(repo) {
-    const owner: string = repo.owner.login;
-    const name: string = repo.name;
-
-    return { owner, name };
-  } else {
-    throw new Error("Repository data was not found in event payload.");
-  }
-}
-function getIssueData(issue: any): any {
-  if(issue) {
-    const number:number = issue.number;
-    return { number };
-  } else {
-    throw new Error("Issue data was not found in event payload.");
-  }
-}
-function createIssueComment(message: string, status: string, mentions:Array<string>=[]): string {
-  const statusIcon:string = status === 'failed' ? ':X:' : ':white_check_mark:'
-  let mentionsText:string = '';
-
-  for(let mention of mentions) {
-    mentionsText += `@${mention} `;
-  }
-
-  const body:string = outdent`## Outcome
-
-  ${statusIcon} ${message}
-
-  CC: ${mentionsText}
-  `;
-
-  return body;
-}
 async function run(): Promise<void> {
   try {
     const message: string = core.getInput('message');
@@ -68,4 +37,8 @@ async function run(): Promise<void> {
   }
 }
 
-run();
+if(!module.parent) {
+  run();
+}
+
+export { run };
