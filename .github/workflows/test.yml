@@ -1,23 +1,31 @@
 name: "build-test"
-on: # rebuild any PRs and main branch changes
-  pull_request:
-  push:
-    branches:
-      - master
-      - 'releases/*'
+on: [push, pull_request]
 
 jobs:
-  build: # make sure build/ci work properly
+  lint-test:
+    name: 'Lint and Test NOde: ${{ matrix.node }}'
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [ '12', '10', '8' ]
     steps:
-    - uses: actions/checkout@v1
-    - run: |
-        npm install
-        npm run all
-  test: # make sure the action works on a clean machine without building
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - uses: ./
-      with: 
-        milliseconds: 1000
+    - name: Checkout Repo
+      uses: actions/checkout@v1
+    - name: Setup Node
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node }}
+    - uses: actions/cache@v1
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ matrix.node }}-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-${{ matrix.node }}-
+    - name: Install NPM Packages
+      run: npm ci
+    - name: lint
+      run: npm run lint
+    - name: Check Formatting
+      run: npm rum format-check
+    - name: Run Tests
+      run: npm test
