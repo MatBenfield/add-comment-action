@@ -3,7 +3,7 @@ on: [push, pull_request]
 
 jobs:
   lint-test:
-    name: 'Lint and Test NOde: ${{ matrix.node }}'
+    name: 'Lint and Test Node: ${{ matrix.node }}'
     runs-on: ubuntu-latest
     strategy:
       matrix:
