@@ -1,27 +1,46 @@
-import {wait} from '../src/wait'
-import * as process from 'process'
-import * as cp from 'child_process'
-import * as path from 'path'
+jest.mock("@actions/core");
+jest.mock("@actions/github");
+const { GitHub, context } = require("@actions/github");
+const core = require("@actions/core");
 
-test('throws invalid number', async () => {
-  const input = parseInt('foo', 10)
-  await expect(wait(input)).rejects.toThrow('milliseconds not a number')
-})
+import { run } from '../src/main';
 
-test('wait 500 ms', async () => {
-  const start = new Date()
-  await wait(500)
-  const end = new Date()
-  var delta = Math.abs(end.getTime() - start.getTime())
-  expect(delta).toBeGreaterThan(450)
-})
+const functions = {
+  getInput: jest.fn(value => value),
+  debug: jest.fn(message => console.log(`MOCK DEBUG: ${message}`)),
+  setFailed: jest.fn(message => console.error(`Big bad error ${message}`)),
+  createComment: jest.fn((message, status) => true)
+}
+beforeAll(() => {
+  process.env.GITHUB_TOKEN = 'not-a-token';
+  core.getInput = functions.getInput;
+  core.debug = functions.debug;
+  core.setFailed = functions.setFailed;
 
-// shows how the runner will run a javascript action with env / stdout protocol
-test('test runs', () => {
-  process.env['INPUT_MILLISECONDS'] = '500'
-  const ip = path.join(__dirname, '..', 'lib', 'main.js')
-  const options: cp.ExecSyncOptions = {
-    env: process.env
-  }
-  console.log(cp.execSync(`node ${ip}`, options).toString())
-})
+  context.payload = {
+    repository: {
+      name: 'loth-cat-pen-monitor',
+      owner: {
+        login: 'ezra'
+      }
+    },
+    issue: {
+      number: 1
+    }
+  };
+  GitHub.mockImplementation(() => {
+    return {
+      issues: {
+        createComment: functions.createComment
+      }
+    }
+  });
+});
+test('Main', async () => {
+  await run();
+
+  expect(functions.getInput).toHaveBeenCalledTimes(2);
+  expect(functions.createComment).toHaveBeenCalled();
+
+
+});
