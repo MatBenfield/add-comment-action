@@ -1,11 +1,7 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
-import { WebhookPayload } from '@actions/github/lib/interfaces';
-import {
-  getRepoData,
-  getIssueData,
-  createIssueComment
-} from './utils';
+import {WebhookPayload} from '@actions/github/lib/interfaces';
+import {getRepoData, getIssueData, createIssueComment} from './utils';
 
 async function run(): Promise<void> {
   try {
@@ -13,14 +9,14 @@ async function run(): Promise<void> {
     const status: string = core.getInput('stepStatus');
     const githubToken: string = process.env.GITHUB_TOKEN || '';
 
-    if(githubToken) {
+    if (githubToken) {
       const octokit: github.GitHub = new github.GitHub(githubToken);
 
       const payload: WebhookPayload = github.context.payload;
       const issue = payload.issue;
       const repository = payload.repository;
-      const { owner, name:repo } = getRepoData(repository);
-      const { number } = getIssueData(issue);
+      const {owner, name: repo} = getRepoData(repository);
+      const {number} = getIssueData(issue);
       const body = createIssueComment(message, status);
 
       await octokit.issues.createComment({
@@ -37,8 +33,8 @@ async function run(): Promise<void> {
   }
 }
 
-if(!module.parent) {
+if (!module.parent) {
   run();
 }
 
-export { run };
+export {run};

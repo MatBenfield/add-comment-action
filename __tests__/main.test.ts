@@ -1,16 +1,16 @@
-jest.mock("@actions/core");
-jest.mock("@actions/github");
-const { GitHub, context } = require("@actions/github");
-const core = require("@actions/core");
+jest.mock('@actions/core');
+jest.mock('@actions/github');
+const {GitHub, context} = require('@actions/github');
+const core = require('@actions/core');
 
-import { run } from '../src/main';
+import {run} from '../src/main';
 
 const functions = {
   getInput: jest.fn(value => value),
   debug: jest.fn(message => console.log(`MOCK DEBUG: ${message}`)),
   setFailed: jest.fn(message => console.error(`Big bad error ${message}`)),
   createComment: jest.fn((message, status) => true)
-}
+};
 beforeAll(() => {
   process.env.GITHUB_TOKEN = 'not-a-token';
   core.getInput = functions.getInput;
@@ -33,7 +33,7 @@ beforeAll(() => {
       issues: {
         createComment: functions.createComment
       }
-    }
+    };
   });
 });
 test('Main', async () => {
@@ -41,6 +41,4 @@ test('Main', async () => {
 
   expect(functions.getInput).toHaveBeenCalledTimes(2);
   expect(functions.createComment).toHaveBeenCalled();
-
-
 });
