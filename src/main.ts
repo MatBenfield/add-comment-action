@@ -27,7 +27,9 @@ async function run(): Promise<void> {
         repo
       });
 
+        core.debug(`The label property is ${label}`)
         if(label){
+            core.debug('Adding the label')
             await octokit.issues.addLabels({
                 label: [ label ]
             })
