@@ -22,7 +22,7 @@ async function run(): Promise<void> {
 
       await octokit.issues.createComment({
         body,
-        number,
+          issue_number: number,
         owner,
         repo
       });
@@ -31,7 +31,12 @@ async function run(): Promise<void> {
         if(label){
             core.debug('Adding the label')
             await octokit.issues.addLabels({
-                label: [ label ]
+                owner,
+                repo,
+                issue_number: number,
+                labels: [
+                    `${label}`
+                ]
             })
         }
     } else {
