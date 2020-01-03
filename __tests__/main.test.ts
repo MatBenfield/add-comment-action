@@ -15,7 +15,7 @@ beforeAll(() => {
       number: 1
     }
   };
-  octomock.updateContext(context)
+  octomock.updateContext(context);
 });
 test('Main', async () => {
   await run();
