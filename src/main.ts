@@ -22,22 +22,22 @@ async function run(): Promise<void> {
 
       await octokit.issues.createComment({
         body,
-          issue_number: number,
+        /* eslint-disable-next-line */
+        issue_number: number,
         owner,
         repo
       });
 
-        core.debug(`The label property is ${label}`)
         if(label){
-            core.debug('Adding the label')
             await octokit.issues.addLabels({
                 owner,
                 repo,
+                /* eslint-disable-next-line */
                 issue_number: number,
                 labels: [
                     `${label}`
                 ]
-            })
+            });
         }
     } else {
       throw new Error('GitHub token was not found in environment.');
