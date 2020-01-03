@@ -6,8 +6,8 @@ import {getRepoData, getIssueData, createIssueComment} from './utils';
 async function run(): Promise<void> {
   try {
     const message: string = core.getInput('message');
-      const status: string = core.getInput('stepStatus');
-      const label: string = core.getInput('label');
+    const status: string = core.getInput('stepStatus');
+    const label: string = core.getInput('label');
     const githubToken: string = process.env.GITHUB_TOKEN || '';
 
     if (githubToken) {
@@ -28,17 +28,15 @@ async function run(): Promise<void> {
         repo
       });
 
-        if(label){
-            await octokit.issues.addLabels({
-                owner,
-                repo,
-                /* eslint-disable-next-line */
-                issue_number: number,
-                labels: [
-                    `${label}`
-                ]
-            });
-        }
+      if (label) {
+        await octokit.issues.addLabels({
+          owner,
+          repo,
+          /* eslint-disable-next-line */
+          issue_number: number,
+          labels: [`${label}`]
+        });
+      }
     } else {
       throw new Error('GitHub token was not found in environment.');
     }
