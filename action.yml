@@ -9,6 +9,9 @@ inputs:
     description: 'The status of the previous step. This will change the comment body.'
     default: 'failed'
     required: true
+  label:
+    description: 'A label to add to the issue'
+    required: false
 runs:
   using: 'node12'
   main: 'dist/index.js'
