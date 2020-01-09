@@ -19,6 +19,6 @@ beforeAll(() => {
 });
 test('Main', async () => {
   await run();
-  expect(octomock.mockFunctions.getInput).toHaveBeenCalledTimes(2);
+  expect(octomock.mockFunctions.getInput).toHaveBeenCalledTimes(3);
   expect(octomock.mockFunctions.createComment).toHaveBeenCalled();
 });
