@@ -10,6 +10,7 @@ async function run(): Promise<void> {
     const status: string = core.getInput('stepStatus');
     const successLabel: string = core.getInput('successLabel');
     const failureLabel: string = core.getInput('failureLabel');
+    const mentions: string = core.getInput('mentions')
     const githubToken: string = process.env.GITHUB_TOKEN || '';
 
     if (githubToken) {
@@ -20,7 +21,8 @@ async function run(): Promise<void> {
       const repository = payload.repository;
       const {owner, name: repo} = getRepoData(repository);
       const {number} = getIssueData(issue);
-      const body = createIssueComment(isSuccessful(status) ? successMessage : failureMessage, status);
+      const mentionsList = mentions ? mentions.split(',') : undefined;
+      const body = createIssueComment(isSuccessful(status) ? successMessage : failureMessage, status, mentionsList);
 
       await octokit.issues.createComment({
         body,
