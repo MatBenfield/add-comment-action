@@ -1,13 +1,15 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import {WebhookPayload} from '@actions/github/lib/interfaces';
-import {getRepoData, getIssueData, createIssueComment} from './utils';
+import {getRepoData, getIssueData, createIssueComment, isSuccessful} from './utils';
 
 async function run(): Promise<void> {
   try {
-    const message: string = core.getInput('message');
+    const successMessage: string = core.getInput('successMessage');
+    const failureMessage: string = core.getInput('failureMessage');
     const status: string = core.getInput('stepStatus');
-    const label: string = core.getInput('label');
+    const successLabel: string = core.getInput('successLabel');
+    const failureLabel: string = core.getInput('failureLabel');
     const githubToken: string = process.env.GITHUB_TOKEN || '';
 
     if (githubToken) {
@@ -18,7 +20,7 @@ async function run(): Promise<void> {
       const repository = payload.repository;
       const {owner, name: repo} = getRepoData(repository);
       const {number} = getIssueData(issue);
-      const body = createIssueComment(message, status);
+      const body = createIssueComment(isSuccessful(status) ? successMessage : failureMessage, status);
 
       await octokit.issues.createComment({
         body,
@@ -28,13 +30,13 @@ async function run(): Promise<void> {
         repo
       });
 
-      if (label) {
+        if (successLabel && failureLabel) {
         await octokit.issues.addLabels({
           owner,
           repo,
           /* eslint-disable-next-line */
           issue_number: number,
-          labels: [`${label}`]
+          labels: [`${isSuccessful(status) ? successLabel : failureLabel}`]
         });
       }
     } else {

@@ -39,6 +39,6 @@ beforeAll(() => {
 test('Main', async () => {
   await run();
 
-  expect(functions.getInput).toHaveBeenCalledTimes(3);
+  expect(functions.getInput).toHaveBeenCalledTimes(5);
   expect(functions.createComment).toHaveBeenCalled();
 });
