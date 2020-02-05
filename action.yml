@@ -18,6 +18,9 @@ inputs:
   failureLabel:
     description: 'A label to add to the issue'
     required: false
+  mentions:
+    description: 'Comma separated list of approvers to notify when there is a failure'
+    required: false
 runs:
   using: 'node12'
   main: 'dist/index.js'
