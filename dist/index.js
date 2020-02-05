@@ -3191,9 +3191,11 @@ const utils_1 = __webpack_require__(611);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const message = core.getInput('message');
+            const successMessage = core.getInput('successMessage');
+            const failureMessage = core.getInput('failureMessage');
             const status = core.getInput('stepStatus');
-            const label = core.getInput('label');
+            const successLabel = core.getInput('successLabel');
+            const failureLabel = core.getInput('failureLabel');
             const githubToken = process.env.GITHUB_TOKEN || '';
             if (githubToken) {
                 const octokit = new github.GitHub(githubToken);
@@ -3202,7 +3204,7 @@ function run() {
                 const repository = payload.repository;
                 const { owner, name: repo } = utils_1.getRepoData(repository);
                 const { number } = utils_1.getIssueData(issue);
-                const body = utils_1.createIssueComment(message, status);
+                const body = utils_1.createIssueComment(utils_1.isSuccessful(status) ? successMessage : failureMessage, status);
                 yield octokit.issues.createComment({
                     body,
                     /* eslint-disable-next-line */
@@ -3210,13 +3212,17 @@ function run() {
                     owner,
                     repo
                 });
-                if (label) {
+                core.debug(`status: ${status}`);
+                core.debug(`successLabel: ${successLabel}`);
+                core.debug(`failureLabel: ${failureLabel}`);
+                core.debug(`both?: ${successLabel && failureLabel}`);
+                if (successLabel && failureLabel) {
                     yield octokit.issues.addLabels({
                         owner,
                         repo,
                         /* eslint-disable-next-line */
                         issue_number: number,
-                        labels: [`${label}`]
+                        labels: [`${utils_1.isSuccessful(status) ? successLabel : failureLabel}`]
                     });
                 }
             }
@@ -7643,7 +7649,7 @@ function getIssueData(issue) {
 }
 exports.getIssueData = getIssueData;
 function createIssueComment(message, status, mentions = []) {
-    const statusIcon = status === 'failed' ? ':X:' : ':white_check_mark:';
+    const statusIcon = isSuccessful(status) ? ':white_check_mark:' : ':X:';
     let mentionsText = '';
     for (let mention of mentions) {
         mentionsText += `@${mention} `;
@@ -7657,6 +7663,10 @@ function createIssueComment(message, status, mentions = []) {
     return body;
 }
 exports.createIssueComment = createIssueComment;
+function isSuccessful(status) {
+    return status == 'success';
+}
+exports.isSuccessful = isSuccessful;
 
 
 /***/ }),
