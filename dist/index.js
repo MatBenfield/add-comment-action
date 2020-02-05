@@ -3196,6 +3196,7 @@ function run() {
             const status = core.getInput('stepStatus');
             const successLabel = core.getInput('successLabel');
             const failureLabel = core.getInput('failureLabel');
+            const mentions = core.getInput('mentions');
             const githubToken = process.env.GITHUB_TOKEN || '';
             if (githubToken) {
                 const octokit = new github.GitHub(githubToken);
@@ -3204,7 +3205,8 @@ function run() {
                 const repository = payload.repository;
                 const { owner, name: repo } = utils_1.getRepoData(repository);
                 const { number } = utils_1.getIssueData(issue);
-                const body = utils_1.createIssueComment(utils_1.isSuccessful(status) ? successMessage : failureMessage, status);
+                const mentionsList = mentions ? mentions.split(',') : undefined;
+                const body = utils_1.createIssueComment(utils_1.isSuccessful(status) ? successMessage : failureMessage, status, mentionsList);
                 yield octokit.issues.createComment({
                     body,
                     /* eslint-disable-next-line */
@@ -7649,7 +7651,7 @@ function getIssueData(issue) {
 }
 exports.getIssueData = getIssueData;
 function createIssueComment(message, status, mentions = []) {
-    const statusIcon = isSuccessful(status) ? ':white_check_mark:' : ':X:';
+    const statusIcon = isSuccessful(status) ? ':white_check_mark:' : ':x:';
     let mentionsText = '';
     for (let mention of mentions) {
         mentionsText += `@${mention} `;
