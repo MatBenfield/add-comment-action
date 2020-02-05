@@ -29,7 +29,10 @@ async function run(): Promise<void> {
         owner,
         repo
       });
-
+        core.debug(`status: ${status}`)
+        core.debug(`successLabel: ${successLabel}`)
+        core.debug(`failureLabel: ${failureLabel}`)
+        core.debug(`both?: ${successLabel && failureLabel}`)
         if (successLabel && failureLabel) {
         await octokit.issues.addLabels({
           owner,
