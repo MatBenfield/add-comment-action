@@ -25,7 +25,9 @@ export function createIssueComment(
   status: string,
   mentions: string[] = []
 ): string {
-  const statusIcon: string = isSuccessful(status) ? ':white_check_mark:' : ':x:';
+  const statusIcon: string = isSuccessful(status)
+    ? ':white_check_mark:'
+    : ':x:';
   let mentionsText = '';
 
   for (let mention of mentions) {
@@ -42,6 +44,6 @@ export function createIssueComment(
   return body;
 }
 
-export function isSuccessful(status: string){
-    return status == 'success';
+export function isSuccessful(status: string): boolean {
+  return status == 'success';
 }

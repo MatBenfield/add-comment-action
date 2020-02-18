@@ -1,7 +1,12 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import {WebhookPayload} from '@actions/github/lib/interfaces';
-import {getRepoData, getIssueData, createIssueComment, isSuccessful} from './utils';
+import {
+  getRepoData,
+  getIssueData,
+  createIssueComment,
+  isSuccessful
+} from './utils';
 
 async function run(): Promise<void> {
   try {
@@ -10,7 +15,7 @@ async function run(): Promise<void> {
     const status: string = core.getInput('stepStatus');
     const successLabel: string = core.getInput('successLabel');
     const failureLabel: string = core.getInput('failureLabel');
-    const mentions: string = core.getInput('mentions')
+    const mentions: string = core.getInput('mentions');
     const githubToken: string = process.env.GITHUB_TOKEN || '';
 
     if (githubToken) {
@@ -22,7 +27,11 @@ async function run(): Promise<void> {
       const {owner, name: repo} = getRepoData(repository);
       const {number} = getIssueData(issue);
       const mentionsList = mentions ? mentions.split(',') : undefined;
-      const body = createIssueComment(isSuccessful(status) ? successMessage : failureMessage, status, mentionsList);
+      const body = createIssueComment(
+        isSuccessful(status) ? successMessage : failureMessage,
+        status,
+        mentionsList
+      );
 
       await octokit.issues.createComment({
         body,
@@ -31,11 +40,11 @@ async function run(): Promise<void> {
         owner,
         repo
       });
-        core.debug(`status: ${status}`)
-        core.debug(`successLabel: ${successLabel}`)
-        core.debug(`failureLabel: ${failureLabel}`)
-        core.debug(`both?: ${successLabel && failureLabel}`)
-        if (successLabel && failureLabel) {
+      core.debug(`status: ${status}`);
+      core.debug(`successLabel: ${successLabel}`);
+      core.debug(`failureLabel: ${failureLabel}`);
+      core.debug(`both?: ${successLabel && failureLabel}`);
+      if (successLabel && failureLabel) {
         await octokit.issues.addLabels({
           owner,
           repo,
