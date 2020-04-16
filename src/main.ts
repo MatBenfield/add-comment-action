@@ -10,7 +10,7 @@ import {
 
 async function run(): Promise<void> {
   try {
-    const successMessage: string = core.getInput('successMessage');
+    const message: string = core.getInput('message');
     const failureMessage: string = core.getInput('failureMessage');
     const status: string = core.getInput('stepStatus');
     const successLabel: string = core.getInput('successLabel');
@@ -27,11 +27,16 @@ async function run(): Promise<void> {
       const {owner, name: repo} = getRepoData(repository);
       const {number} = getIssueData(issue);
       const mentionsList = mentions ? mentions.split(',') : undefined;
-      const body = createIssueComment(
-        isSuccessful(status) ? successMessage : failureMessage,
-        status,
-        mentionsList
-      );
+        let body;
+      if(status) {
+        body = createIssueComment(
+            isSuccessful(status) ? message : failureMessage,
+            status,
+            mentionsList
+        );
+      } else {
+          body = message;
+      }
 
       await octokit.issues.createComment({
         body,
