@@ -27,15 +27,15 @@ async function run(): Promise<void> {
       const {owner, name: repo} = getRepoData(repository);
       const {number} = getIssueData(issue);
       const mentionsList = mentions ? mentions.split(',') : undefined;
-        let body;
-      if(status) {
+      let body;
+      if (status) {
         body = createIssueComment(
-            isSuccessful(status) ? message : failureMessage,
-            status,
-            mentionsList
+          isSuccessful(status) ? message : failureMessage,
+          status,
+          mentionsList
         );
       } else {
-          body = message;
+        body = message;
       }
 
       await octokit.issues.createComment({
